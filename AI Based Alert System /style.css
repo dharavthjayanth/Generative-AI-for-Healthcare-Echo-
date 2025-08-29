@@ -1,0 +1,210 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #f4f8fb, #e6f0f8);
+    margin: 0;
+    padding: 16px;
+    color: #333;
+}
+
+h1 {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+}
+
+.form-section {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    max-width: 100%;
+    margin: 0 auto 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+select, button {
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #0077cc;
+    color: white;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #005fa3;
+}
+
+.profile-card {
+    background: #ffffff;
+    border-left: 6px solid #2c3e50;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+}
+
+.profile-card h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.profile-card p {
+    font-size: 14px;
+    margin: 4px 0;
+}
+
+.vitals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.vitals-table th, .vitals-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.vitals-table th {
+    background-color: #f0f4f8;
+    font-weight: 600;
+}
+
+.normal-row {
+    background-color: #e9fbe9;
+    transition: background-color 0.4s ease-in-out;
+}
+
+.alert-row {
+    background-color: #ffe6e6;
+    color: #b00020;
+    font-weight: bold;
+    transition: background-color 0.4s ease-in-out;
+}
+
+.latest-row {
+    animation: pulseRow 1.5s ease-out;
+    box-shadow: 0 0 10px rgba(0, 150, 0, 0.3);
+}
+
+@keyframes pulseRow {
+    0% {
+        transform: scale(1.03);
+        opacity: 0.2;
+    }
+    50% {
+        transform: scale(1.00);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.01);
+    }
+}
+
+.alert {
+    background-color: #ffeaea;
+    border-left: 6px solid #e53935;
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 24px;
+}
+
+.alert h3 {
+    margin: 0 0 10px;
+    color: #b71c1c;
+}
+
+.insight {
+    background-color: #e6f4ea;
+    border-left: 6px solid #2e7d32;
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 24px;
+}
+
+.insight h3 {
+    margin: 0 0 10px;
+    color: #1b5e20;
+}
+
+.download-btn {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.download-btn a {
+    display: inline-block;
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.download-btn a:hover {
+    background-color: #388e3c;
+}
+
+.fallback-response {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.fallback-ok-btn {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.fallback-ok-btn:hover {
+    background-color: #388e3c;
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 20px;
+    }
+
+    .form-section, .profile-card, .alert, .insight {
+        padding: 14px;
+    }
+
+    select, button {
+        font-size: 15px;
+    }
+
+    .vitals-table th, .vitals-table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .download-btn a {
+        font-size: 14px;
+        padding: 10px 18px;
+    }
+}
