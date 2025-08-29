@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login to Echo</title>
+    <style>
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            
+            background: linear-gradient(135deg, #e6fff7, #d9fff0);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+       
+        .watermark {
+            position: absolute;
+            font-size: 500px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(127, 174, 159, 0.20); 
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+        }
+
+        
+        .login-container {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .login-container h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #2a2a2a;
+        }
+        
+        
+        .error {
+            color: #ff5c5c;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input[type="password"] {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #bfffe3; 
+            color: #006f56;          
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #9ef6d5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="watermark">Echo</div>
+    <div class="login-container">
+        <h1>Login to Echo</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="post" action="{{ url_for('authenticate') }}">
+            <input type="password" id="password" name="password" placeholder="Enter Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
