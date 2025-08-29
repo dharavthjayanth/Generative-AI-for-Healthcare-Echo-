@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Echo - Voice Interactive Chat</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e6fff7, #d9fff0);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .watermark {
+      position: absolute;
+      font-size: 150px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: rgba(127, 174, 159, 0.06);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 600px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .chat-box {
+      border: 1px solid #ccc;
+      background: #fcfcfc;
+      padding: 10px;
+      border-radius: 8px;
+      height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-message {
+      padding: 8px;
+      border-radius: 6px;
+      max-width: 95%;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: normal;
+    }
+    .user {
+      background: #e7f3ff;
+      align-self: flex-start;
+    }
+    .ai {
+      background: #d2ffe7;
+      align-self: flex-end;
+    }
+    .input-container {
+      display: flex;
+      gap: 10px;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: #fff;
+      transition: background-color 0.2s;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .mic-button {
+      background-color: #ff9800;
+      color: #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .mic-button:hover {
+      background-color: #e68900;
+    }
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #007bff;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .toggle-label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .chat-message table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .chat-message table, .chat-message th, .chat-message td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: left;
+    }
+    .chat-message th {
+      background-color: #e8f4f1;
+    }
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logout-btn {
+      font-size: 14px;
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+    .logout-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark">Echo</div>
+
+  <div class="container">
+    <div class="header-section">
+      <h2>Echo - Voice Interactive Chat</h2>
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="toggle-container">
+      <label class="toggle-label" for="voice-toggle">Voice Mode</label>
+      <label class="toggle-switch">
+        <input type="checkbox" id="voice-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="selection">
+      <label for="ai-choice">Choose AI:</label>
+      <select id="ai-choice">
+        <option value="openai">OpenAI (ChatGPT)</option>
+        <option value="anthropic">Anthropic (Claude)</option>
+      </select>
+    </div>
+
+    <div class="chat-box" id="chat-box"></div>
+
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+      <div class="mic-button" onclick="startSpeechRecognition()">🎤</div>
+    </div>
+  </div>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    let voiceMode = false;
+    const synth = window.speechSynthesis;
+
+    document.getElementById('voice-toggle').addEventListener('change', function () {
+      voiceMode = this.checked;
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('user-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      const aiChoice = document.getElementById('ai-choice').value;
+      const chatBox = document.getElementById('chat-box');
+
+      
+      const userMsgDiv = document.createElement('div');
+      userMsgDiv.classList.add('chat-message', 'user');
+      userMsgDiv.innerHTML = `<strong>User:</strong><br>${message}`;
+      chatBox.appendChild(userMsgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      input.value = '';
+
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, ai_choice: aiChoice })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const aiMsgDiv = document.createElement('div');
+        aiMsgDiv.classList.add('chat-message', 'ai');
+
+        
+        const formattedReply = marked.parse(data.reply || "No response");
+        aiMsgDiv.innerHTML = `<strong>AI:</strong><br>${formattedReply}`;
+        chatBox.appendChild(aiMsgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (voiceMode && data.reply) {
+          const utterance = new SpeechSynthesisUtterance(data.reply);
+          synth.speak(utterance);
+        }
+      })
+      .catch(err => console.error('Error:', err));
+    }
+
+    function startSpeechRecognition() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('user-input').value = transcript;
+        sendMessage();
+      };
+
+      recognition.onerror = function (event) {
+        console.error('Speech recognition error:', event.error);
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
