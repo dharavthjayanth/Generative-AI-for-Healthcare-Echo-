@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏪 AI Health Monitor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .live-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1s infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🏪 AI Health Monitoring Dashboard <span class="live-dot"></span></h1>
+
+    <div class="form-section">
+        <form method="POST">
+            <label for="profile"><strong>Select Profile:</strong></label>
+            <select name="profile" id="profile" title="Profile selection">
+                <option value="A" {% if current_profile == 'A' %}selected{% endif %}>Person A (Age 62)</option>
+                <option value="B" {% if current_profile == 'B' %}selected{% endif %}>Person B (Age 92)</option>
+            </select>
+
+            <label for="ai_model"><strong>Select AI Model:</strong></label>
+            <select name="ai_model" id="ai_model" title="AI model selection">
+                <option value="ChatGPT (OpenAI)" {% if current_ai == 'ChatGPT (OpenAI)' %}selected{% endif %}>ChatGPT (OpenAI)</option>
+                <option value="Claude AI" {% if current_ai == 'Claude AI' %}selected{% endif %}>Claude AI</option>
+            </select>
+
+            <button type="submit">🔁 Update</button>
+        </form>
+    </div>
+
+    <div class="profile-card">
+        <h3>👤 Active Profile: {{ profile.name }} (Age {{ profile.age }})</h3>
+        <p><strong>Status:</strong> {{ profile.status }}</p>
+        <p><strong>Medical History:</strong> {{ profile.medical }}</p>
+        <p><strong>AI Model in Use:</strong> {{ current_ai }}</p>
+    </div>
+
+    <h3>📊 Last 5 Vital Readings</h3>
+    <table class="vitals-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>SpO₂ (%)</th>
+                <th>Heart Rate (bpm)</th>
+                <th>Systolic BP (mmHg)</th>
+                <th>Diastolic BP(mmHg)</th>
+            </tr>
+        </thead>
+        <tbody id="vitals-body">
+            
+        </tbody>
+    </table>
+
+    {% if alert %}
+    <div class="alert">
+        <h3>🚨 Emergency Alert</h3>
+        <p><strong>AI Emergency Summary:</strong></p>
+        <p>{{ last_summary }}</p>
+    </div>
+
+    {% if fallback_enabled %}
+    <div class="fallback-response">
+        <form method="POST" action="{{ url_for('respond') }}">
+            <input type="hidden" name="response" value="i am okay" />
+            <button type="submit" class="fallback-ok-btn">
+                ✅ I'm Okay
+            </button>
+        </form>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if last_insight %}
+    <div class="insight">
+        <h3>🧐 AI Health Insight</h3>
+        <p>{{ last_insight }}</p>
+    </div>
+    {% endif %}
+
+    {% if last_voice_log %}
+    <div class="insight">
+        <h3>🎹 Last Voice Response</h3>
+        <p>{{ last_voice_log }}</p>
+    </div>
+    {% endif %}
+
+    <div class="download-btn">
+        <a href="{{ url_for('download_report') }}">📅 Download PDF Report</a>
+    </div>
+
+    <script>
+        const voicePrompt = "{{ last_voice_log | escape }}";
+        if (voicePrompt && voicePrompt.trim() !== "") {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(voicePrompt);
+            utterance.rate = 1.0;
+            utterance.lang = "en-US";
+            synth.speak(utterance);
+        }
+    </script>
+    <script>
+        async function fetchVitals() {
+            try {
+                const response = await fetch('/api/vitals');
+                const data = await response.json();
+                const tbody = document.getElementById('vitals-body');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                data.forEach((v, i) => {
+                    const is_alert = v.spo2 < 88 || v.heart_rate > 135 || v.bp_sys > 180;
+                    const rowClass = is_alert ? 'alert-row' : 'normal-row';
+                    const latestClass = i === data.length - 1 ? 'latest-row' : '';
+                    const row = document.createElement('tr');
+                    row.className = `${rowClass} ${latestClass}`;
+                    row.innerHTML = `
+                        <td>${v.timestamp}</td>
+                        <td>${v.spo2}</td>
+                        <td>${v.heart_rate}</td>
+                        <td>${v.bp_sys}</td>
+                        <td>${v.bp_dia}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('❌ Error fetching vitals:', err);
+            }
+        }
+        setInterval(fetchVitals, 5000);
+        fetchVitals();
+    </script>
+
+</body>
+</html>
